@@ -28,6 +28,17 @@ def generate_launch_description():
             executable='route_controller',
             output='screen'
         ),
+        Node(
+            package='route_subscriber',
+            executable='route_subscriber',
+            output='screen'
+        ),
+        Node(
+            package='minimal_timer',
+            executable='minimal_timer',
+            output='screen'
+        ),
+
     ]
 
     return LaunchDescription(list)
