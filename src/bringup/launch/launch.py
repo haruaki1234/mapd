@@ -38,6 +38,11 @@ def generate_launch_description():
             executable='minimal_timer',
             output='screen'
         ),
+        Node(
+            package='map_publisher',
+            executable='map_publisher',
+            output='screen'
+        ),
 
     ]
 

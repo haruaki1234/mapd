@@ -10,12 +10,15 @@
 namespace tlab
 {
 
+const size_t ROBOT_NUM = 3;
+
 class RouteController : public rclcpp::Node {
 private:
     rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher_;
     rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr pose_publisher_;
     rclcpp::Publisher<nav_msgs::msg::Path>::SharedPtr path_publisher_;
     rclcpp::Publisher<my_msgs::msg::RouteRequest>::SharedPtr route_request_publisher_;
+    std::vector<rclcpp::Subscription<nav_msgs::msg::Path>::SharedPtr> calc_path_subscription_;
     rclcpp::TimerBase::SharedPtr timer_;
     size_t count_;
     double x_value_ = 0.0;
@@ -24,7 +27,7 @@ private:
 
 public:
     RouteController(const rclcpp::NodeOptions& options) : RouteController("", options) {}
-    RouteController(const std::string& name_space = "", const rclcpp::NodeOptions& options = rclcpp::NodeOptions()) : Node("route_controller_node", name_space, options), all_robot_path(3)
+    RouteController(const std::string& name_space = "", const rclcpp::NodeOptions& options = rclcpp::NodeOptions()) : Node("route_controller_node", name_space, options), all_robot_path(ROBOT_NUM)
     {
         using namespace std::chrono_literals;
         // publisher_ =
@@ -34,6 +37,13 @@ public:
         route_request_publisher_ = this->create_publisher<my_msgs::msg::RouteRequest>("route_request_topic_test", rclcpp::QoS(10));
         static auto path_msg = std::make_shared<nav_msgs::msg::Path>();
         path_msg->header.frame_id = "map"; // 基準座標を決めている、送るときだけ
+
+        for (size_t i = 0; i < ROBOT_NUM; i++) {
+            calc_path_subscription_.push_back(this->create_subscription<nav_msgs::msg::Path>("calc_path_" + std::to_string(i), rclcpp::QoS(10), [&, i](const nav_msgs::msg::Path::SharedPtr msg) {
+                RCLCPP_INFO(this->get_logger(), "calc_path_sub : %d", i);
+                all_robot_path[i] = *msg;
+            }));
+        }
 
         timer_ = this->create_wall_timer(500ms, [&]() {
             // auto msg = std::make_shared<std_msgs::msg::String>();
@@ -56,10 +66,10 @@ public:
             // RCLCPP_INFO(this->get_logger(), "Pub:%lf", path_msg->poses.back().pose.position.x);
             // path_publisher_->publish(*path_msg);
 
-            int send_no = 0;
+            int send_no = 1;
 
             auto route_request_msg = std::make_shared<my_msgs::msg::RouteRequest>();
-            route_request_msg->robot_name = "r" + std::to_string(send_no);
+            route_request_msg->robot_no = send_no;
             route_request_msg->start.pose.position.x = 2.5;
             route_request_msg->goal.pose.position.x = 5.5;
 
@@ -69,7 +79,7 @@ public:
                 }
             }
 
-            RCLCPP_INFO(this->get_logger(), "Pub:%s", route_request_msg->robot_name.c_str());
+            RCLCPP_INFO(this->get_logger(), "Pub:%d", route_request_msg->robot_no);
             RCLCPP_INFO(this->get_logger(), "Pub:%lf", route_request_msg->start.pose.position.x);
             RCLCPP_INFO(this->get_logger(), "Pub:%lf", route_request_msg->goal.pose.position.x);
             route_request_publisher_->publish(*route_request_msg);
