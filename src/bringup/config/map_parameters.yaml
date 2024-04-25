@@ -1,0 +1,6 @@
+/**:
+  ros__parameters:
+    resolution: 10
+    height_m: 19
+    width_m: 37
+    inflate_m: 0.3

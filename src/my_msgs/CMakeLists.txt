@@ -14,6 +14,7 @@ ament_auto_find_build_dependencies()
 
 rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/RouteRequest.msg"
+  "msg/OrderRequest.msg"
   
   DEPENDENCIES std_msgs
   DEPENDENCIES sensor_msgs

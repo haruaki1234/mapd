@@ -18,32 +18,43 @@ from launch_ros.descriptions import ComposableNode
 def generate_launch_description():
     pkg_dir = get_package_share_directory("bringup")
     list = [
-        Node(
-            package='route_calculator',
-            executable='route_calculator',
-            output='screen'
-        ),
+        # Node(
+        #     package='order_publisher',
+        #     executable='order_publisher',
+        #     output='screen',
+        #     parameters=[
+        #         os.path.join(pkg_dir, "config", "map_parameters.yaml")
+        #     ]
+        # ),
         Node(
             package='route_controller',
             executable='route_controller',
             output='screen'
         ),
         Node(
-            package='route_subscriber',
-            executable='route_subscriber',
-            output='screen'
-        ),
-        Node(
-            package='minimal_timer',
-            executable='minimal_timer',
-            output='screen'
-        ),
-        Node(
             package='map_publisher',
             executable='map_publisher',
-            output='screen'
+            output='screen',
+            parameters=[
+                os.path.join(pkg_dir, "config", "map_parameters.yaml")
+            ]
         ),
-
+        Node(
+            package='route_calculator',
+            executable='route_calculator',
+            output='screen',
+            parameters=[
+                os.path.join(pkg_dir, "config", "map_parameters.yaml")
+            ]
+        ),
+        Node(
+            package='sub_judge',
+            executable='sub_judge',
+            output='screen',
+            parameters=[
+                os.path.join(pkg_dir, "config", "map_parameters.yaml")
+            ]
+        ),
     ]
 
     return LaunchDescription(list)
