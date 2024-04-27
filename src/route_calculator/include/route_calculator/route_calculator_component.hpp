@@ -10,6 +10,8 @@
 #include "a_star.hpp"
 #include "g_layor.hpp"
 
+#include <cmath>
+
 namespace tlab
 {
 
@@ -38,7 +40,8 @@ private:
     std::vector<float> pos;
     std::vector<int> MATpos;
     std::vector<float> node_MATpoint;
-    float sqrt_2 = 1.414;
+    float sqrt_2 = sqrt(2.0);
+    ;
     float inflate_m;
 
     std::vector<float> start_;
